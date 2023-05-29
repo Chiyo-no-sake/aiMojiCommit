@@ -26,6 +26,6 @@ commit_types:
   - label: 'style'
     detail: 'Select when working on style'
     prefix: 'style 🌈'
-  - revert: 'revert'
+  - label: 'revert'
     detail: 'Select when reverting a commit'
     prefix: 'revert ⏪'
