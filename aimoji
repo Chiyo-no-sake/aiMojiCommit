@@ -1,0 +1,236 @@
+#!/bin/bash
+
+# Set the config file path
+CONFIG_FILE_PATH=~/.aimojicommit/config.yaml
+REMOTE_DEFAULT_CONFIG_FILE_PATH=https://raw.githubusercontent.com/aimojicommit/master/config.yaml
+
+
+# Function to check and install dependencies
+check_dependencies() {
+    local missing_bash_dependencies=()
+    local missing_python_dependencies=()
+
+    # Check git
+    type git >/dev/null 2>&1 || missing_bash_dependencies+=("git")
+
+    # Check fzf
+    type fzf >/dev/null 2>&1 || missing_bash_dependencies+=("fzf")
+
+    # Check yq
+    type yq >/dev/null 2>&1 || missing_bash_dependencies+=("yq")
+
+    # Check python3
+    type python3 >/dev/null 2>&1 || missing_bash_dependencies+=("python3")
+
+    if [[ ${#missing_bash_dependencies[@]} -gt 0 ]]; then
+        echo "Error: The following bash dependencies are missing: ${missing_bash_dependencies[*]}"
+        exit 1
+    fi
+
+    # Check PyYAML module
+    python3 -c "import yaml" &>/dev/null || missing_python_dependencies+=("PyYAML")
+
+    # Check openai module
+    python3 -c "import openai" &>/dev/null || missing_python_dependencies+=("openai")
+
+    if [[ ${#missing_python_dependencies[@]} -gt 0 ]]; then
+        echo "Error: The following Python dependencies are missing: ${missing_python_dependencies[*]}"
+        echo "Installing dependencies..."
+        exit 1
+    fi
+}
+
+
+# Function to check if there are any changes in the git repository
+check_git_status() {
+    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        echo "Error: Not a git repository. Exiting."
+        exit 1
+    fi
+
+    if git diff --cached --quiet; then
+        echo "No changes added to commit. Use 'git add' to track changes."
+        exit 1
+    fi
+}
+
+# Function to create default config file
+create_default_config() {
+    if [[ ! -f "$CONFIG_FILE_PATH" ]]; then
+        mkdir -p ~/.mojicommit
+        wget "$REMOTE_DEFAULT_CONFIG_FILE_PATH" > "$CONFIG_FILE_PATH"
+
+        echo "It appears to be the first time you run $0."
+        read -p "Enter your OpenAI API key (press Enter to skip -> disable AI commit gen): " openAIKey
+        echo "openAIKey: '$openAIKey'" >> "$CONFIG_FILE_PATH"
+    fi
+}
+
+# Load the configuration file
+load_config() {
+    LABELS=$(yq e '.commit_types.[].label' $CONFIG_FILE_PATH)
+    OPENAI_KEY=$(yq e '.openAIKey' $CONFIG_FILE_PATH)
+}
+
+# Function to prompt the user for a commit type
+prompt_commit_type() {
+    echo "$LABELS" | fzf --header 'Please choose a commit type'
+}
+
+# ai commit message generation
+determine_commit_message() {
+    local COMMIT_DIFFS=$1
+    local COMMIT_STATS=$2
+    local COMMIT_MESSAGE=$(python - <<EOF
+import openai
+import yaml
+import sys
+import os
+
+def load_api_key():
+    api_key_file = os.path.expanduser('~/.mojicommit/config.yaml')
+    with open(api_key_file) as file:
+        api_key = yaml.safe_load(file)
+    return api_key['openAIKey']
+
+def generate_commit_message(stats, diffs):
+    # Set up your OpenAI API key
+    openai.api_key = load_api_key()
+    prompt = f"##Git Stats\n{stats}\n\n## Git Diffs\n{diffs}\n\n## Commit Message:"
+
+    response = openai.Completion.create(
+        engine='text-davinci-003',
+        prompt=prompt,
+        max_tokens=64,
+        temperature=.5,
+        n=1,
+        stop=None,
+    )
+
+    commit_message = response.choices[0].text.strip()
+    return commit_message
+
+try:
+    commit_msg = generate_commit_message('''$COMMIT_STATS''','''$COMMIT_DIFFS''')
+    sys.stdout.write(commit_msg)
+except Exception as e:
+    sys.stderr.write(f"Error: {str(e)}")
+    sys.exit(1)
+EOF
+)
+
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to execute the Python script. Exiting." >&2
+        exit 1
+    fi
+
+    echo $COMMIT_MESSAGE
+}
+
+# Function to make a commit
+make_commit() {
+    local PREFIX=$(python -c "import yaml; config = yaml.safe_load(open('$CONFIG_FILE_PATH')); print(next((item['prefix'] for item in config['commit_types'] if item['label'].strip() == '$COMMIT_TYPE'), ''))")
+    
+    if [[ -z $PREFIX ]]; then
+        echo "Error: Invalid commit type. Exiting."
+        exit 1
+    fi
+
+    local CHANGES=`git diff --cached`
+    local CHANGES_LENGTH=`echo $CHANGES | wc -c`
+
+    local DIFF_STAT=`git diff --cached --stat`
+    local DIFF_STAT_LENGTH=`echo $DIFF_STAT | wc -c`
+
+    local TOT_LENGTH=`expr $DIFF_STAT_LENGTH + $CHANGES_LENGTH`
+
+    # Create a temporary file
+    TEMP_FILE=$(mktemp)
+    # Write the prefix and a colon to the temporary file
+    echo -n "${PREFIX}" > $TEMP_FILE
+
+    if [[ $TOT_LENGTH -lt 10000 && -n $OPENAI_KEY ]]; then
+        echo "Generating AI commit message"
+        echo -n ": " >> $TEMP_FILE
+
+        # Call the external function to determine the commit message
+        COMMIT_MESSAGE=$(determine_commit_message "$DIFF_STAT" "$CHANGES")
+
+        if [[ -z $COMMIT_MESSAGE ]]; then
+            echo "Error: Unable to determine the commit message. Exiting."
+            exit 1
+        else
+            echo "Generated commit message: $COMMIT_MESSAGE"
+        fi
+
+        # Append the generated commit message to the temporary file
+        echo -n "$COMMIT_MESSAGE" >> $TEMP_FILE
+
+        # Use the temporary file as the commit message template
+        git commit -et $TEMP_FILE
+
+        # Remove the temporary file
+        rm $TEMP_FILE
+    else
+        git commit -et $TEMP_FILE
+        rm $TEMP_FILE
+    fi
+}
+
+
+# Check for preconfigured merge commit message
+check_for_preconfigured_merge_commit() {
+    MERGE_MESSAGE_FILE=$(git rev-parse --git-dir)/MERGE_MSG
+    if [[ -f $MERGE_MESSAGE_FILE ]]; then
+        COMMIT_MESSAGE=$(cat $MERGE_MESSAGE_FILE)
+        echo "Found preconfigured merge commit message: $COMMIT_MESSAGE"
+        read -p "Do you want to use this message? (Y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Nn]$ ]]
+        then
+            git commit
+            exit 0
+        fi
+    fi
+}
+
+
+# Check dependencies
+check_dependencies
+
+# Check git status
+check_git_status
+
+# Create default config file if not exists
+create_default_config
+
+# Load config
+load_config
+
+# Parse command line arguments
+while getopts "t:" opt; do
+    case ${opt} in
+        t)
+            COMMIT_TYPE=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" 1>&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+# Check for preconfigured commit message
+check_for_preconfigured_merge_commit
+
+# Prompt for commit type if not provided as a CLI argument
+if [[ -z $COMMIT_TYPE ]]; then
+    COMMIT_TYPE=$(prompt_commit_type)
+fi
+
+# Make the commit
+make_commit
