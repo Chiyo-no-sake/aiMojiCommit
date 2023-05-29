@@ -104,7 +104,15 @@ def load_api_key():
 def generate_commit_message(stats, diffs):
     # Set up your OpenAI API key
     openai.api_key = load_api_key()
-    prompt = f"##Git Stats\n{stats}\n\n## Git Diffs\n{diffs}\n\n## Commit Message:"
+    prompt = f"""Generate a concise git commit message written in present tense and using only natural language (no scope, keyword or parenthesis), trying to describe the changes result, for the following code diffs and stats:
+
+##Git Stats
+{stats}
+
+## Git Diffs
+{diffs}
+
+## Commit Message:"""
 
     retries = 3  # Number of retries
     for attempt in range(1, retries + 1):
@@ -112,8 +120,8 @@ def generate_commit_message(stats, diffs):
             response = openai.Completion.create(
                 engine='text-davinci-003',
                 prompt=prompt,
-                max_tokens=64,
-                temperature=.5,
+                max_tokens=96,
+                temperature=.7,
                 n=1,
                 stop=None,
             )
@@ -157,7 +165,7 @@ make_commit() {
         exit 1
     fi
 
-    local CHANGES=`git diff --cached`
+    local CHANGES=`git diff --cached -U10`
     local CHANGES_LENGTH=`echo $CHANGES | wc -c`
 
     local DIFF_STAT=`git diff --cached --stat`
