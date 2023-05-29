@@ -2,7 +2,7 @@
 
 # Set the config file path
 CONFIG_FILE_PATH=~/.aimojicommit/config.yaml
-REMOTE_DEFAULT_CONFIG_FILE_PATH=https://raw.githubusercontent.com/aimojicommit/master/config.yaml
+REMOTE_DEFAULT_CONFIG_FILE_PATH=https://raw.githubusercontent.com/aimojicommit/main/config.yaml
 
 
 # Function to check and install dependencies
