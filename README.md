@@ -53,7 +53,7 @@ If there are any preconfigured merge commit messages, aimojicommit will prompt y
 
 ## Contributing 🤝
 
-If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/username/repo).
+If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [Github Issues page](https://github.com/Chiyo-no-sake/aiMojiCommit/issues).
 
 ## License 📄
 
