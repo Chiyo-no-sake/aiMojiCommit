@@ -10,7 +10,7 @@ To install aiMojiCommit, run the following command:
 mkdir -p ~/.aimojicommit && \
   wget --quiet -O - https://raw.githubusercontent.com/Chiyo-no-sake/aiMojiCommit/main/aimoji > ~/.aimojicommit/aimoji && \
   chmod +x ~/.aimojicommit/aimoji && \
-  ln -s ~/.aimojicommit/aimoji /usr/local/bin/aimoji
+  sudo ln -sf ~/.aimojicommit/aimoji /usr/local/bin/aimoji
 ```
 
 ## Dependencies 🛠️
