@@ -106,7 +106,7 @@ def generate_commit_message(stats, diffs):
     # Set up your OpenAI API key
     openai.api_key = load_api_key()
     commit_prefix = os.environ['COMMIT_PREFIX']
-    prompt = f"""Generate a concise and descriptive git commit message written in present tense and using only natural language and no emoji. Logically group each change and write a sentence describing the new code. Generate a commit message based only on the following git stats and diffs:
+    prompt = f"""Generate a concise and descriptive git commit message written in present tense and using only natural language and no emoji. Logically group changes and write a short sentence describing each group changes. Maintain the output in one single line. Base your answer only on the following git stats and diffs:
 
 ##Git Stats
 {stats}
@@ -123,7 +123,7 @@ def generate_commit_message(stats, diffs):
             response = openai.Completion.create(
                 engine='text-davinci-003',
                 prompt=prompt,
-                max_tokens=96,
+                max_tokens=64,
                 temperature=.5,
                 n=1,
                 stop=None,
@@ -192,7 +192,7 @@ make_commit() {
             echo "Error: Unable to determine the commit message. Exiting."
             exit 1
         else
-            echo "Generated commit message: $COMMIT_MESSAGE"
+            echo Generated commit message: "$COMMIT_MESSAGE" >&2
         fi
 
         # Append the generated commit message to the temporary file
