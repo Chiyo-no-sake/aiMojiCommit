@@ -124,7 +124,7 @@ def generate_commit_message(stats, diffs):
                 engine='text-davinci-003',
                 prompt=prompt,
                 max_tokens=64,
-                temperature=.5,
+                temperature=.6,
                 n=1,
                 stop=None,
             )
@@ -168,7 +168,7 @@ make_commit() {
         exit 1
     fi
 
-    local CHANGES=`git diff --cached -U10`
+    local CHANGES=`git diff --cached -U5`
     local CHANGES_LENGTH=`echo $CHANGES | wc -c`
 
     local DIFF_STAT=`git diff --cached --stat`
