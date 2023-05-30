@@ -115,7 +115,7 @@ def generate_commit_message(stats, diffs):
 {diffs}
 
 ## Commit Message: 
-{commit_prefix}"""
+{commit_prefix}:"""
 
     retries = 3  # Number of retries
     for attempt in range(1, retries + 1):
@@ -178,25 +178,47 @@ make_commit() {
 
     # Create a temporary file
     TEMP_FILE=$(mktemp)
-    # Write the prefix and a colon to the temporary file
-    echo -n "${PREFIX}" > $TEMP_FILE
+
 
     if [[ $TOT_LENGTH -lt 10000 && -n $OPENAI_KEY ]]; then
         echo "Generating AI commit message"
-        echo -n ": " >> $TEMP_FILE
 
-        # Call the external function to determine the commit message
-        COMMIT_MESSAGE=$(determine_commit_message "$DIFF_STAT" "$CHANGES")
+        local confirmed=false
+        while [[ $confirmed == false ]]; do
+            # Write the prefix to the temporary file
+            echo -n "${PREFIX}" > $TEMP_FILE
+            echo -n ": " >> $TEMP_FILE
 
-        if [[ -z $COMMIT_MESSAGE ]]; then
-            echo "Error: Unable to determine the commit message. Exiting."
-            exit 1
-        else
-            echo Generated commit message: "$COMMIT_MESSAGE" >&2
-        fi
+            # Call the external function to determine the commit message
+            COMMIT_MESSAGE=$(determine_commit_message "$DIFF_STAT" "$CHANGES" "$PREFIX")
 
-        # Append the generated commit message to the temporary file
-        echo -n "$COMMIT_MESSAGE" >> $TEMP_FILE
+            if [[ -z $COMMIT_MESSAGE ]]; then
+                echo "Error: Unable to determine the commit message. Exiting."
+                exit 1
+            else
+                echo
+                echo Final commit message: >&2
+                echo "$PREFIX: ""$COMMIT_MESSAGE" >&2
+            fi
+
+            # Append the generated commit message to the temporary file
+            echo -n "$COMMIT_MESSAGE" >> $TEMP_FILE
+
+            # Ask if the message is ok or must be regenerated
+            read -p "Edit the message or regenerate? (E/r/q) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Rr]$ ]]
+            then
+                confirmed=true
+            elif [[ $REPLY =~ ^[Qq]$ ]]
+            then
+                rm $TEMP_FILE
+                exit 0
+            else
+                # Remove the generated commit message from the temporary file
+                echo -n '' > $TEMP_FILE
+            fi
+        done
 
         # Use the temporary file as the commit message template
         git commit -eF $TEMP_FILE
@@ -204,6 +226,8 @@ make_commit() {
         # Remove the temporary file
         rm $TEMP_FILE
     else
+        # Write the prefix to the temporary file
+        echo -n "${PREFIX}" > $TEMP_FILE
         git commit -eF $TEMP_FILE
         rm $TEMP_FILE
     fi
