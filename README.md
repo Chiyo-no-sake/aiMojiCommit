@@ -24,12 +24,24 @@ aiMojiCommit relies on the following dependencies:
 - `openai`: Python package for OpenAI API
 - `pyyaml`: Python package for YAML
 
-Make sure these dependencies are installed on your system before using aiMojiCommit:
+Make sure these dependencies are installed on your system before using aiMojiCommit.
+To install them, follow this instructions:
+
+#### Debian
   
-```shell
-sudo apt install git fzf python3 python3-pip
+```sh
+sudo apt install -y git fzf python3 python3-pip && \
 python3 -m pip install openai pyyaml
 ```
+#### Linux
+Refer to you distro's package manager documentation
+
+#### MacOS
+```sh
+brew install git fzf python3 python3-pip && \
+python3 -m pip install openai pyyaml
+```
+
 
 ## Configuration ⚙️
 
