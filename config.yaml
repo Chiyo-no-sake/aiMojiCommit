@@ -29,3 +29,6 @@ commit_types:
   - label: 'revert'
     detail: 'Select when reverting a commit'
     prefix: 'revert ⏪'
+  - label: 'wip'
+    detail: 'Select when work in progress'
+    prefix: 'wip 🚧'

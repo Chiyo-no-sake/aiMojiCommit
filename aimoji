@@ -106,15 +106,15 @@ def generate_commit_message(stats, diffs):
     # Set up your OpenAI API key
     openai.api_key = load_api_key()
     commit_prefix = os.environ['COMMIT_PREFIX']
-    prompt = f"""Generate a concise and descriptive git commit message written in present tense and using only natural language and no emoji. Logically group changes and write a short sentence describing each group changes. Maintain the output in one single line. Base your answer only on the following git stats and diffs:
+    prompt = f"""Generate a concise and descriptive git commit message written in present tense and using only natural language and no emoji. Logically group changes and write a short sentence for each. Maintain the output in one single line. Base your answer only on the following git stats and diffs:
 
 ##Git Stats
 {stats}
 
-## Git Diffs
+##Git Diffs
 {diffs}
 
-## Commit Message: 
+##Commit Message
 {commit_prefix}:"""
 
     retries = 3  # Number of retries
@@ -180,7 +180,7 @@ make_commit() {
     TEMP_FILE=$(mktemp)
 
 
-    if [[ $TOT_LENGTH -lt 10000 && -n $OPENAI_KEY ]]; then
+    if [[ $TOT_LENGTH -lt 15000 && -n $OPENAI_KEY ]]; then
         echo "Generating AI commit message"
 
         local confirmed=false
