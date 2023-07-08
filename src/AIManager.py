@@ -19,7 +19,7 @@ class AIManager:
         self.config_manager = config_manager
 
     def get_prompt(self, stats: str, diffs: str, commit_prefix: str):
-        return f"""Generate a concise and descriptive git commit message written in present tense and using no emojis apart from the ones provided by the prefix. Interpret the following changes and describe the meaning of the changes, not single operations. Maintain the commit message in one single line and use maximum 72 characters for the commit message. Before writing the commit message, explain which changes are supposed to be invloved in each conclusion of your commit message. Your answer must have this format: "<motivations...> ##Message: {commit_prefix}: <generated commit message>"
+        return f"""Generate a concise and descriptive git commit message written in present tense and using no emojis apart from the ones provided by the prefix. Interpret the following changes and describe their meaning as a list of statements, and include their concepts in the commit message. Maintain the commit message in one single line and use maximum 72 characters for the commit message. Your answer must contain text with this format: "##Message: {commit_prefix}: <generated commit message>"
 ##Git Stats
 {stats}
 ##Git Diffs
@@ -47,7 +47,6 @@ class AIManager:
         openai.api_key = self.config_manager.get_openai_api_key()
         prompt = self.get_prompt(stats, diffs, commit_prefix)
 
-        click.echo("using prompt: " + prompt)
         retries = 3  # Number of retries
         for attempt in range(1, retries + 1):
             try:
@@ -60,7 +59,6 @@ class AIManager:
                     stop=None,
                 )
                 response_text = response.choices[0].message.content.strip()
-                click.echo("response: " + response_text)
                 response_parts = response_text.split("##Message: ")
                 if(len(response_parts) != 2):
                     raise RuntimeError(f"OpenAI response malformed")
