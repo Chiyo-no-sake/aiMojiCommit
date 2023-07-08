@@ -4,7 +4,7 @@ commit_types:
     prefix: 'refactor ⚙️'
   - label: 'performance'
     detail: 'Select when working on performances'
-    prefix: 'perf ⚡'
+    prefix: 'perf ⚡️'
   - label: 'feature'
     detail: 'Select when adding new functionality'
     prefix: 'feat 🦄'

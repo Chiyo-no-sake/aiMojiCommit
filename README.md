@@ -4,50 +4,51 @@ aimojicommit is a lightweight tool that helps you generate meaningful commit mes
 
 ## Installation 💻
 
-To install aiMojiCommit, run the following command:
+Sure! Here are the installation instructions for your tool, "aiMojiCommit":
 
-```shell
-mkdir -p ~/.aimojicommit && \
-  wget --quiet -O - https://raw.githubusercontent.com/Chiyo-no-sake/aiMojiCommit/main/aimoji > ~/.aimojicommit/aimoji && \
-  chmod +x ~/.aimojicommit/aimoji && \
-  sudo ln -sf ~/.aimojicommit/aimoji /usr/local/bin/aimoji
+## Installation
+
+### Windows (wip)
+
+Open PowerShell as an administrator and run the following command:
+
+```powershell
+iex "& { $(irm -useb https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-windows.zip -Headers @{ 'user-agent' = 'Mozilla/5.0'; 'accept' = '*/*' }) }"; Move-Item -Path .\aimojicommit.exe -Destination $env:USERPROFILE\AppData\Local\bin\aimoji.exe -Force
+```
+
+### macOS - arm64
+
+Open Terminal and execute the following command:
+
+```bash
+curl -LJO https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-macos-arm64.tar.gz && tar -xzf aimojicommit-macos.tar.gz && mv ./aimojicommit /usr/local/bin/aimoji
+```
+
+### Linux (wip)
+
+Open a terminal and run the following command:
+
+```bash
+curl -LJO https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-linux.tar.gz && tar -xzf aimojicommit-linux.tar.gz && sudo mv ./aimojicommit /usr/local/bin/aimoji
+```
+
+Once installed, you can use the tool by running `aimoji` in any location within your terminal.
+
+### Manual installation
+Head to the release page and download the latest release for your operating system. Extract the archive and move the `aimojicommit` executable to a directory in your PATH. You can also rename the executable to `aimoji` if you wish to be able to use the tool by running `aimoji` in your terminal.
+
 ```
 
 ## Dependencies 🛠️
 
-aiMojiCommit relies on the following dependencies:
-
-- `git`: Version control system
-- `fzf`: Command-line fuzzy finder
-- `yq`: Command-line YAML processor
-- `python3`: Python interpreter
-- `openai`: Python package for OpenAI API
-- `pyyaml`: Python package for YAML
-
-Make sure these dependencies are installed on your system before using aiMojiCommit.
-To install them, follow this instructions:
-
-#### Debian
-  
-```sh
-sudo apt install -y git fzf python3 python3-pip && \
-python3 -m pip install openai pyyaml
-```
-#### Linux
-Refer to you distro's package manager documentation
-
-#### MacOS
-```sh
-brew install git fzf python3 python3-pip && \
-python3 -m pip install openai pyyaml
-```
+aiMojiCommit is born for and relies on git, which must be installed and available as 'git' in your PATH.
 
 
 ## Configuration ⚙️
 
-aiMojiCommit uses a configuration file to specify commit types and OpenAI API key. The default configuration file is located at `~/.aimojicommit/config.yaml`. If the configuration file doesn't exist, aiMojiCommit will create it for you and prompt you to enter your OpenAI API key. If no API key is provided, aiMojiCommit will not use the OpenAI API and will prompt you to review and modify the commit message before committing
+aiMojiCommit uses a configuration file to specify commit types and OpenAI API key. The default configuration file is located at `$HOME/.aimojicommit/config.yaml`. If the configuration file doesn't exist, aiMojiCommit will create it for you and prompt you to enter your OpenAI API key and choose the model to use, model IDs that ends with 32k are recommended, since they have a bigger context window and allows generating commit messages for longer diffs.
 
-To modify the commit types or update your OpenAI API key, edit the `config.yaml` file using a text editor.
+To modify the commit types or update your OpenAI API key or model, edit the `config.yaml` file using a text editor, or use the `aimoji set-key <openai key>` or `aimoji set-model <openai-model-id>` commands (use `aimoji list-models` to list all your available models).
 
 ## Usage 🚀
 
@@ -65,7 +66,7 @@ If there are any preconfigured merge commit messages, aimojicommit will prompt y
 
 ## Contributing 🤝
 
-If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [Github Issues page](https://github.com/Chiyo-no-sake/aiMojiCommit/issues).
+If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request on the [GitHub Issues page](https://github.com/Chiyo-no-sake/aiMojiCommit/issues).
 
 ## License 📄
 
