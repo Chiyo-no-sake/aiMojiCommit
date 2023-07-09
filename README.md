@@ -16,8 +16,6 @@ After this, it will be available as `aimoji` in your terminal.
 - Clone this repository
 - Run `pip install .` in the root directory of the repository
 
-```
-
 ## Dependencies 🛠️
 
 aiMojiCommit is born for and relies on git, which must be installed and available as 'git' in your PATH.
