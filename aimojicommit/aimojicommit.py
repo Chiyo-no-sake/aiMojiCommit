@@ -8,33 +8,28 @@ from aimojicommit import constants
 def model_id(model: Model):
     return model.id
 
-def setup_config(config_manager: ConfigManager):
+def setup_config(config_manager: ConfigManager, ai_manager: AIManager):
     openai_key = config_manager.get_openai_api_key()
     chat_model = config_manager.get_openai_chat_model()
     if openai_key is None:
-        set_key(None)
+        set_key(None, config_manager)
     if chat_model is None:
-        set_model(None)
+        set_model(None, config_manager, ai_manager)
 
 
-def set_key(key: str or None):
-    config_manager = ConfigManager()
-    config_manager.load_config()
+def set_key(key: str or None, config_manager: ConfigManager = None):
     if not key:
         key = click.prompt("Please enter your OpenAI API key", type=str)
 
     config_manager.set_openai_api_key(key)
 
 
-def set_model(model: str or None):
-    config_manager = ConfigManager()
-    config_manager.load_config()
+def set_model(model: str or None, config_manager: ConfigManager = None, ai_manager: AIManager = None):
+    models = ai_manager.list_available_models()
 
-    models = AIManager(config_manager).list_available_models()
-
-    if not model:
+    if model is None:
         model = ChoicesManager(config_manager).choose_option(
-            "Please choose an OpenAI chat model (*-32k suggested)", list(map(model_id, models))
+            "Please choose an OpenAI chat model (*-16k suggested)", list(map(model_id, models))
         )
 
     if model not in list(map(model_id, models)):
@@ -48,14 +43,6 @@ def set_model(model: str or None):
 @click.option("-t", "--commit-type", help="Specify the commit type", default=None)
 def aimojicommit(commit_type):
     click.echo("🤖 Aimoji Commit")
-    config_manager = ConfigManager()
-    config_manager.load_config()
-    click.echo(f"Loaded config from {config_manager.file_path}")
-
-    setup_config(config_manager)
-
-    choices_manager = ChoicesManager(config_manager)
-    ai_manager = AIManager(config_manager)
 
     if not GitManager.is_git_installed():
         click.echo("Error: Git is not installed. Exiting.")
@@ -64,6 +51,14 @@ def aimojicommit(commit_type):
     if not GitManager.is_inside_repository():
         click.echo("Error: Not inside a git repository. Exiting.")
         raise click.Abort()
+
+    config_manager = ConfigManager()
+    config_manager.load_config()
+    click.echo(f"Loaded config from {config_manager.file_path}")
+
+    choices_manager = ChoicesManager(config_manager)
+    ai_manager = AIManager(config_manager)
+    setup_config(config_manager, ai_manager)
 
     diffs = GitManager.get_diff_changes()
     stats = GitManager.get_diff_stats()
@@ -99,7 +94,7 @@ def aimojicommit(commit_type):
         click.echo(
             "Changes are too large to generate a commit message. Opening editor."
         )
-        GitManager.commit_with_message(commit_type)
+        GitManager.commit_with_message(commit_type['value'])
     else:
         need_regenerate = True
         while need_regenerate:
@@ -128,13 +123,18 @@ def aimojicommit(commit_type):
 @aimojicommit.command("set-model")
 @click.argument("model", default=None)
 def set_model_cmd(model):
-    set_model(model)
+    config_manager = ConfigManager()
+    config_manager.load_config()
+    ai_manager = AIManager(config_manager)
+    set_model(model, config_manager, ai_manager)
 
 
 @aimojicommit.command("set-key")
 @click.argument("key", default=None)
 def set_key_cmd(key):
-    set_key(key)
+    config_manager = ConfigManager()
+    config_manager.load_config()
+    set_key(key, config_manager)
 
 
 if __name__ == "__main__":

@@ -42,6 +42,7 @@ class GitManager:
     @staticmethod
     def commit_with_message(commit_message):
         temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        print(commit_message)
         temp_file.write(commit_message)
         temp_file.close()
 

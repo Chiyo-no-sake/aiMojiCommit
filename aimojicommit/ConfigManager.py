@@ -11,6 +11,7 @@ class ConfigManager:
         self.file_path = os.path.join(self.root_folder, constants.config_file_name)
         self.config = None
 
+
     def load_config(self) -> None:
         if not os.path.exists(self.root_folder):
             os.makedirs(self.root_folder)

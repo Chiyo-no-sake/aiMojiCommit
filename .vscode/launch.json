@@ -8,7 +8,7 @@
       "name": "aimojicommit.py",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/aimojicommit.py",
+      "program": "${workspaceFolder}/aimojicommit/aimojicommit.py",
       "console": "integratedTerminal",
       "justMyCode": true
     }
