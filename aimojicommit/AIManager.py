@@ -19,7 +19,7 @@ class AIManager:
         self.config_manager = config_manager
 
     def get_prompt(self, stats: str, diffs: str, commit_prefix: str):
-        return f"""Generate a concise and descriptive git commit message written in present tense and using no emojis apart from the ones provided by the prefix. Interpret the following changes and describe the meaning of each change as a list of statements, and include their concepts in the commit message. Maintain the commit message in one single line and use maximum 72 characters for the commit message. Your answer must contain text with this format: "##Message: {commit_prefix}: <generated commit message>"
+        return f"""Generate a concise and descriptive git commit message written in present tense and using no emojis apart from the ones provided by the prefix. Interpret the following changes and make a mind-map of the meaning of each change as a list of statements, and combine their concepts in a one-line commit message. Maintain the commit message in one single line and use maximum 72 characters. Your answer must contain text with this format: "##Message: {commit_prefix}: <generated commit message>"
 ##Git Stats
 {stats}
 ##Git Diffs
