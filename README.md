@@ -2,46 +2,26 @@
 
 aimojicommit is a lightweight tool that helps you generate meaningful commit messages for your Git commits. It uses AI-powered text generation to suggest commit messages based on your changes and provides a selection of commit types to choose from, with customizable categories 💡
 
-## Installation 💻
+## Installation 💻 (testend on MacOS arm64 only)
 
-Sure! Here are the installation instructions for your tool, "aiMojiCommit":
+Install this software using pip:
+  
+  ```shell
+  pip install aimojicommit
+  ```
 
-## Installation
-
-### Windows (wip)
-
-Open PowerShell as an administrator and run the following command:
-
-```powershell
-iex "& { $(irm -useb https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-windows.zip -Headers @{ 'user-agent' = 'Mozilla/5.0'; 'accept' = '*/*' }) }"; Move-Item -Path .\aimojicommit.exe -Destination $env:USERPROFILE\AppData\Local\bin\aimoji.exe -Force
-```
-
-### macOS - arm64
-
-Open Terminal and execute the following command:
-
-```bash
-curl -LOJ https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-macos-arm64 && sudo mv ./aimojicommit-macos-arm64 /usr/local/bin/aimoji && sudo chmod +x /usr/local/bin/aimoji
-```
-
-### Linux (wip)
-
-Open a terminal and run the following command:
-
-```bash
-curl -LOJ https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-linux-amd64 > aimoji && sudo mv ./aimoji /usr/local/bin/aimoji && sudo chmod +x /usr/local/bin/aimoji
-```
-
-Once installed, you can use the tool by running `aimoji` in any location within your terminal.
+After this, it will be available as `aimoji` in your terminal.
 
 ### Manual installation
-Head to the release page and download the latest release for your operating system. Extract the archive and move the `aimojicommit` executable to a directory in your PATH. You can also rename the executable to `aimoji` if you wish to be able to use the tool by running `aimoji` in your terminal.
+- Clone this repository
+- Run `pip install .` in the root directory of the repository
 
 ```
 
 ## Dependencies 🛠️
 
 aiMojiCommit is born for and relies on git, which must be installed and available as 'git' in your PATH.
+Also, aiMojiCommit is a python package, and it needs Python 3.10 or higher to run.
 
 
 ## Configuration ⚙️
