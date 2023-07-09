@@ -1,5 +1,5 @@
 import pick
-from ConfigManager import ConfigManager
+from aimojicommit.ConfigManager import ConfigManager
 
 class ChoicesManager:
     def __init__(self, config_manager: ConfigManager):

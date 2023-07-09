@@ -1,8 +1,8 @@
 import yaml
-import constants
 import os
 import requests
 from pathlib import Path
+from aimojicommit import constants
 
 class ConfigManager:
     def __init__(self):

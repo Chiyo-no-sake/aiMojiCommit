@@ -1,10 +1,10 @@
 import openai
 import click
-import constants
 import time
 import tiktoken
-from ConfigManager import ConfigManager
 from dataclasses import dataclass
+from aimojicommit import constants
+from aimojicommit.ConfigManager import ConfigManager
 
 @dataclass
 class Model:

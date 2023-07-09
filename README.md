@@ -21,7 +21,7 @@ iex "& { $(irm -useb https://github.com/Chiyo-no-sake/aiMojiCommit/releases/late
 Open Terminal and execute the following command:
 
 ```bash
-curl -LJO https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-macos-arm64.tar.gz && tar -xzf aimojicommit-macos.tar.gz && mv ./aimojicommit /usr/local/bin/aimoji
+curl -LOJ https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-macos-arm64 && sudo mv ./aimojicommit-macos-arm64 /usr/local/bin/aimoji && sudo chmod +x /usr/local/bin/aimoji
 ```
 
 ### Linux (wip)
@@ -29,7 +29,7 @@ curl -LJO https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download
 Open a terminal and run the following command:
 
 ```bash
-curl -LJO https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-linux.tar.gz && tar -xzf aimojicommit-linux.tar.gz && sudo mv ./aimojicommit /usr/local/bin/aimoji
+curl -LOJ https://github.com/Chiyo-no-sake/aiMojiCommit/releases/latest/download/aimojicommit-linux-amd64 > aimoji && sudo mv ./aimoji /usr/local/bin/aimoji && sudo chmod +x /usr/local/bin/aimoji
 ```
 
 Once installed, you can use the tool by running `aimoji` in any location within your terminal.

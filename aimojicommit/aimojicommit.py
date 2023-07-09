@@ -1,8 +1,9 @@
 import click
-from ChoicesManager import ChoicesManager
-from ConfigManager import ConfigManager
-from GitManager import GitManager
-from AIManager import AIManager, Model
+from aimojicommit.ChoicesManager import ChoicesManager
+from aimojicommit.ConfigManager import ConfigManager
+from aimojicommit.GitManager import GitManager
+from aimojicommit.AIManager import AIManager, Model
+from aimojicommit import constants
 
 def model_id(model: Model):
     return model.id
