@@ -2,7 +2,7 @@
 
 aimojicommit is a lightweight tool that helps you generate meaningful commit messages for your Git commits. It uses AI-powered text generation to suggest commit messages based on your changes and provides a selection of commit types to choose from, with customizable categories 💡
 
-## Installation 💻 (testend on MacOS arm64 only)
+## Installation 💻 (tested on MacOS arm64 only)
 
 Install this software using pip:
   
